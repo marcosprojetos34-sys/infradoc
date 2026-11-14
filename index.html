@@ -1851,6 +1851,25 @@ function espLabelSVG(r,p,n,o){const g=lbGeo(r,p,n,o),q=lbQR(g.url,g.h),N=q.getMo
   for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(q.isDark(y,x))d+=`M${(x0+x*c).toFixed(3)} ${(y0+y*c).toFixed(3)}h${c.toFixed(3)}v${c.toFixed(3)}h-${c.toFixed(3)}z`;
   const tx=g.ml+g.q+g.gap;
   return{...g,svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.wmm} ${g.h}" style="width:${g.wmm}mm;height:${g.h}mm" font-family="InterDoc, Inter, Arial, sans-serif"><rect width="${g.wmm}" height="${g.h}" fill="#fff"/><path d="${d}" fill="#000"/><text x="${tx}" y="${(g.top+g.pa*(g.l2?.52:.72)).toFixed(2)}" font-size="${g.f1}" font-weight="800" fill="#000" letter-spacing="-.02">${esc(g.l1)}</text>${g.l2?`<text x="${tx}" y="${(g.top+g.pa*.93).toFixed(2)}" font-size="${g.f2}" font-weight="600" fill="#000">${esc(g.l2)}</text>`:''}</svg>`}}
+function pdfLabelSVG(r,p,n,o,qrOnly){const h=+o.fita||18,pa=LBPA[h]||13.5;
+  if(qrOnly){const url=lbUrl(p,n),q=lbQR(url,h),N=q.getModuleCount(),c=pa/N,wmm=pa+1.5*2,x0=(wmm-pa)/2,y0=(h-pa)/2;let d='';
+    for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(q.isDark(y,x))d+=`M${(x0+x*c).toFixed(3)} ${(y0+y*c).toFixed(3)}h${c.toFixed(3)}v${c.toFixed(3)}h-${c.toFixed(3)}z`;
+    return{wmm,h,svg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${wmm} ${h}"><rect width="${wmm}" height="${h}" fill="#fff"/><path d="${d}" fill="#000"/></svg>`}}
+  const L=espLabelSVG(r,p,n,{...o,l2:'none'});return{wmm:L.wmm,h:L.h,svg:L.svg}}
+async function labelsPDF(rid,qrOnly){const r=rackById(rid||cur.rack);if(!r)return;const o=lbOpts(),pts=[];
+  r.itens.filter(i=>i.tipo==='patch'&&!i.esp).sort((a,b)=>a.u-b.u).forEach(p=>{for(let n=1;n<=p.portas;n++)if(p.cons[n]&&(p.cons[n].sw||p.cons[n].eq||p.cons[n].loc))pts.push([p,n])});
+  if(!pts.length){toast('Nenhum ponto documentado neste rack ainda.');return}
+  if(!window.jspdf||!window.svg2pdf){toast('PDF indisponível neste navegador');return}
+  toast('Gerando PDF para a gráfica…');await new Promise(res=>setTimeout(res,30));
+  const MM=2.83464567,PW=595.28,PH=841.89,margin=10*MM,gapX=3*MM,gapY=4*MM;
+  const doc=pdfDoc(PW,PH);let x=margin,y=margin,rowH=0;
+  for(const[p,n]of pts){const L=pdfLabelSVG(r,p,n,o,qrOnly),w=L.wmm*MM,h=L.h*MM;
+    if(x+w>PW-margin){x=margin;y+=rowH+gapY;rowH=0}
+    if(y+h>PH-margin){doc.addPage([PW,PH],'p');x=margin;y=margin;rowH=0}
+    await doc.svg(pdfPrep(L.svg),{x,y,width:w,height:h});x+=w+gapX;rowH=Math.max(rowH,h)}
+  LASTF=new File([doc.output('blob')],slug('etiquetas-grafica-'+r.nome+(qrOnly?'-qr':'-id'))+'.pdf',{type:'application/pdf'});
+  if(!navigator.canShare||!navigator.canShare({files:[LASTF]})){dl(LASTF,LASTF.name);toast('PDF baixado ✓ — leve para a gráfica imprimir');return}
+  try{await navigator.share({files:[LASTF],title:'Etiquetas para gráfica'})}catch(e){if(e.name!=='AbortError')pdfPronto()}}
 function labelPNG(r,p,n,o,cb){const g=lbGeo(r,p,n,o),k=180/25.4,cv=document.createElement('canvas');cv.width=Math.round(g.wmm*k);cv.height=Math.round(g.h*k);const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);
   const q=lbQR(g.url,g.h),N=q.getModuleCount(),c=Math.max(1,Math.floor(g.q*k/N)),ox=Math.round(g.ml*k+(g.q*k-c*N)/2),oy=Math.round(g.top*k+(g.q*k-c*N)/2);x.fillStyle='#000';for(let yy=0;yy<N;yy++)for(let xx=0;xx<N;xx++)if(q.isDark(yy,xx))x.fillRect(ox+xx*c,oy+yy*c,c,c);
   const tx=(g.ml+g.q+g.gap)*k;x.fillStyle='#000';x.textBaseline='alphabetic';x.font=`800 ${g.f1*k}px InterDoc,Inter,Arial,sans-serif`;x.fillText(g.l1,tx,(g.top+g.pa*(g.l2?.52:.72))*k);
@@ -1886,6 +1905,10 @@ function sheetLabels(rid){const r=rackById(rid||cur.rack);if(!r)return;LBCTX={ri
   openSheet(`<span class="tg pp">Etiquetas · ${esc(r.nome)}</span><h3>Espelhos dos pontos</h3><div class="sub">${pts.length} ponto${pts.length===1?'':'s'} documentado${pts.length===1?'':'s'} · texto + QR · tamanho real</div>
   ${lbCtrls()}
   <div class="lbwrap">${pts.length?pts.map(([p,n])=>`<div onclick="sheetLabel('${p.id}',${n})" style="cursor:pointer">${espLabelSVG(r,p,n,o).svg}</div>`).join(''):'<div class="empty" style="color:#475569">Nenhum ponto documentado neste rack ainda.</div>'}</div>
+  <div class="sec">Imprimir numa gráfica (folha A4)</div>
+  <div class="two"><button class="ib pri" onclick="labelsPDF('${r.id}',false)">⤓ PDF · QR + ID</button><button class="ib" onclick="labelsPDF('${r.id}',true)">⤓ PDF · Só QR</button></div>
+  <div class="note" style="margin-top:-2px">Gera uma folha A4 com todas as etiquetas deste rack lado a lado, no tamanho da fita selecionada acima (${+o.fita||18} mm de altura). Leve o PDF numa gráfica ou papelaria para imprimir em papel adesivo e recortar.</div>
+  <div class="sec">Imprimir na rotuladora</div>
   <div class="big"><button class="ib pri" onclick="labelsCSV('${r.id}')">⤓ CSV para o P-touch Editor</button><button class="ib" onclick="closeSheet()">Fechar</button></div>
   <div class="note" style="margin-top:10px"><b>Fluxo na Brother (PT-E550W / E510):</b> P-touch Editor → <b>Arquivo › Banco de dados › Conectar</b> → escolha o CSV. Monte o layout uma vez: um objeto <b>Código de barras › QR Code</b> ligado à coluna <b>QR</b> e dois textos ligados a <b>Ponto</b> e <b>Linha2</b>. Depois <b>Imprimir › Todos os registros</b> — sai a fita inteira, já numerada.</div>`)}
 function labelsCSV(rid){const r=rackById(rid),o=lbOpts(),rows=[['Ponto','Linha2','Rack','Local','Equipamento','Switch','Porta','QR']];
