@@ -393,7 +393,7 @@ body.authlocked{overflow:hidden}
 <button class="fab" id="fab" onclick="sheetAdd()" title="Adicionar equipamento">＋</button>
 
 <main id="main"></main>
-<div class="foot">InfraDoc · InfraNetCom</div>
+<div class="foot">InfraDoc</div>
 
 <div class="bg" onclick="closeSheet()"></div>
 <div class="sheet" id="sheet"></div>
@@ -894,7 +894,7 @@ const claro=h=>{const[r,g,b]=rgb(h);return(r*299+g*587+b*114)/1000>165};
 
 function demo(){
   const rC=uid(),rP=uid(),s0=uid(),s1=uid(),p0=uid(),p1=uid();
-  return{cliente:'Fareva',tecnico:'Marcos Santos — InfraNetCom',data:today(),servicos:[],
+  return{cliente:'Minha empresa',tecnico:'',data:today(),servicos:[],
     racks:[
       {id:rC,nome:'Rack Principal',local:'CPD (exemplo)',us:12,itens:[
         {id:uid(),tipo:'org',nome:'Organizador',u:1},
@@ -913,7 +913,7 @@ function demo(){
 }
 let S=null,dirty=false,cur={tab:'rack',rack:null,level:'emp'},zf=1,showCab=true,ctx={},DB;
 const DBKEY=KEY+'_db';
-let FRESH=()=>{const p=demo();return{empresas:[{id:uid(),nome:p.cliente||'Fareva',cidade:'',projetos:[{...p,id:uid(),nome:'Implantação · Portaria'}]}],tecnico:p.tecnico||''}};
+let FRESH=()=>{const p=demo();return{empresas:[{id:uid(),nome:p.cliente||'Minha empresa',cidade:'',projetos:[{...p,id:uid(),nome:'Implantação · Portaria'}]}],tecnico:p.tecnico||''}};
 try{DB=JSON.parse(localStorage.getItem(DBKEY))}catch(e){}
 {let E=null;try{const el=document.getElementById('idEmbed');if(el)E=JSON.parse(el.textContent)}catch(e){}if(E&&E.plimg){window._plimgE=E.plimg;delete E.plimg}if(E&&E.empresas&&(!DB||!DB.empresas||DB._demo||(E.savedAt||0)>(DB.savedAt||0))){DB=E;try{localStorage.setItem(DBKEY,JSON.stringify(DB))}catch(e){}}}
 if(!DB||!DB.empresas){let old=null;try{old=JSON.parse(localStorage.getItem(KEY))}catch(e){}
@@ -1682,7 +1682,7 @@ function txtInk(t,fs,wt,k=1){txtW('',fs,wt,0);const m=_mc.measureText(t),m1=_mc.
 function txtW(t,fs,wt,ls){_mc=_mc||document.createElement('canvas').getContext('2d');_mc.font=`${wt} ${fs}px InterDoc,Inter,Arial,sans-serif`;return _mc.measureText(t).width+ls*Math.max(t.length-1,0)}
 function orgCover(it,g,r){const {x0,y0,w,hh}=g,cy=y0+7,ch=hh-5;
   let h=`<rect x="${x0+20}" y="${y0+1}" width="${w-40}" height="7" fill="#050608"/><rect x="${x0+14}" y="${cy}" width="${w-28}" height="${ch}" rx="3" fill="url(#gCover)" stroke="#2f3640"/><rect x="${x0+14}" y="${cy}" width="${w-28}" height="1.6" fill="#ffffff22"/><rect x="${x0+14}" y="${cy+ch-2}" width="${w-28}" height="2" fill="#00000080"/>`;
-  const qt=it.qr==='site'&&it.qrUrl?it.qrUrl:'',txt=(v=>/^agasense$/i.test(v)?'AgaSense':v)(trunc(it.tampaTxt||'',24)),sk=/^AgaSense$/.test(trunc(it.tampaTxt||'',24).replace(/^agasense$/i,'AgaSense'))?2:1,sub=(()=>{let v=trunc(it.tampaSub||'',34).trim();if(!/\s/.test(v))v=v.replace(/([a-z])([A-Z])/g,'$1 $2');return v.toUpperCase().replace(/\s+/g,'\u2002')})(),tx=x0+44,fs=sub?24:22;
+  const qt=it.qr==='site'&&it.qrUrl?it.qrUrl:'',txt=trunc(it.tampaTxt||'',24),sk=1,sub=(()=>{let v=trunc(it.tampaSub||'',34).trim();if(!/\s/.test(v))v=v.replace(/([a-z])([A-Z])/g,'$1 $2');return v.toUpperCase().replace(/\s+/g,'\u2002')})(),tx=x0+44,fs=sub?24:22;
   const nw=txt?txtW(txt,fs,900,-.6):0,l1=txt.length>1?txtW(txt[0],fs,900,0)-.6:0,base=sub?cy+ch*.56:cy+ch/2+8,sfs=+(fs*.3).toFixed(1);
   const ik=txt.length>sk?txtInk(txt,fs,900,sk):null,gS=ik?txtW(txt.slice(0,sk),fs,900,-.6)-.6+ik.l1:0,gE=ik?ik.r-.6*(txt.length-1):0;
   // o subtítulo ocupa exatamente da tinta da 2ª letra até a tinta da última letra do título (descontando as bordas dos próprios glifos do subtítulo)
@@ -2058,7 +2058,7 @@ function renderHome(){
 function sheetEmp(id){const e=id?DB.empresas.find(x=>x.id===id):null;ctx={e,et:(e&&e.tipo)||'escritorio',us:JSON.parse(JSON.stringify((e&&e.usuarios)||[]))};const g=k=>esc(e&&e[k]||'');
   openSheet(`<div class="epv" id="epv" style="--a:${EACC[ctx.et]}"><div id="epvB">${bld(ctx.et,'pv','pv')}</div><div class="epvt"><b id="epvN">${e?esc(e.nome):'Nova empresa'}</b><span id="epvT">${etLabel(ctx.et)}</span><em id="epvH"></em></div></div>
   <div class="fld"><label>Tipo de local <span class="lbh">· toque para ${e?'trocar':'escolher'}</span></label><div class="etipos">${ETIPOS.map(([k,t])=>`<button type="button" class="rtp ${k===ctx.et?'on':''}" onclick="pickET('${k}',this)">${bld(k,'tile','t')}<span>${t}</span></button>`).join('')}</div></div>
-  <div class="fld"><label>Nome da empresa</label><input id="eNome" oninput="$('#epvN').textContent=this.value||'Nova empresa'" value="${g('nome')}" placeholder="Ex.: Loja Centro · Fareva · Condomínio Bela Vista"></div>
+  <div class="fld"><label>Nome da empresa</label><input id="eNome" oninput="$('#epvN').textContent=this.value||'Nova empresa'" value="${g('nome')}" placeholder="Ex.: Loja Centro · Unidade Industrial · Condomínio Bela Vista"></div>
   <div class="two"><div class="fld"><label>CNPJ</label><input id="eCnpj" inputmode="numeric" value="${g('cnpj')}" placeholder="00.000.000/0000-00"></div><div class="fld"><label>Cidade / UF</label><input id="eCid" value="${g('cidade')}" placeholder="Ex.: Itupeva/SP"></div></div>
   <div class="fld"><label>Endereço</label><input id="eEnd" value="${g('endereco')}" placeholder="Rua, número, bairro"></div>
   <div class="sec">Quem cuida da rede</div>
@@ -2104,7 +2104,7 @@ function sheetServ(rid,sid){const r=rackById(rid),x=sid?(r.servicos||[]).find(s=
   const emps=[...new Set([...DB.empresas.map(e=>e.nome),...S.racks.flatMap(rr=>(rr.servicos||[]).map(s=>s.empresa)).filter(Boolean)])];
   openSheet(`<h3>${x?'Serviço':'Registrar serviço'}</h3><div class="sub">${esc(r.nome)}</div>
   <div class="two"><div class="fld"><label>Data</label><input id="sData" type="date" value="${esc(x?x.data:today())}"></div><div class="fld"><label>Tipo</label><select id="sTipo">${STIPOS.map(t=>`<option ${x&&x.tipo===t?'selected':''}>${t}</option>`).join('')}</select></div></div>
-  <div class="fld"><label>Empresa que executou</label><input id="sEmp" list="sEmps" value="${g('empresa')}" placeholder="Ex.: InfraNetCom"><datalist id="sEmps">${emps.map(e=>`<option>${esc(e)}</option>`).join('')}</datalist></div>
+  <div class="fld"><label>Empresa que executou</label><input id="sEmp" list="sEmps" value="${g('empresa')}" placeholder="Ex.: Empresa de TI contratada"><datalist id="sEmps">${emps.map(e=>`<option>${esc(e)}</option>`).join('')}</datalist></div>
   <div class="fld"><label>Responsável técnico</label><input id="sResp" value="${esc(x?x.resp||'':S.tecnico||'')}" placeholder="Quem responde pelo serviço"></div>
   <div class="fld"><label>Equipe que participou <span class="lbh">· uma pessoa por vez, tecle Enter</span></label><div class="eqbox" id="eqChips" onclick="$('#eqIn')&&$('#eqIn').focus()"></div></div>
   <div class="fld"><label>Descrição do serviço</label><textarea id="sDesc" rows="4" placeholder="O que foi feito, materiais, observações…">${g('desc')}</textarea></div>
@@ -2166,7 +2166,7 @@ function render0(){
   $('#pSub').textContent=`${S.racks.length} rack${S.racks.length===1?'':'s'} · ${tot} ponto${tot===1?'':'s'} ativo${tot===1?'':'s'} · ${S.fibras.length} fibra${S.fibras.length===1?'':'s'}`;
   if(cur.rack&&!rackById(cur.rack))cur.rack=null;
   const rk=cur.tab==='rack'?rackById(cur.rack):null;
-  {const c=hstat();if(c&&innerWidth<=760)$('#pSub').textContent=`Patch ${c.ok+c.sr+c.def}/${c.tot} conectados · Switch ${c.swAt}/${c.swTot} ativas`}
+  {const c=hstat();if(c&&innerWidth<=760)$('#pSub').textContent=`Patch ${c.ok+c.sr+c.def}/${c.tot} conectados · Switch ${c.swAt}/${c.swTot} ativas`+(c.trTot?` · Tronco ${c.trUso}/${c.trTot} em uso`:'')}
   const m=$('#main');let h='';const sub=cur.sub||'rack',tsub=cur.tsub||'diag';
   const seg=`<div class="seg mini"><button class="${cur.tab==='rack'?'on':''}" onclick="setTab('rack')">Racks</button><button class="${cur.tab==='topo'?'on':''}" onclick="setTab('topo')">Topologia</button></div>`;
   const fab=$('#fab'),fm=cur.tab!=='rack'?'':rk?(sub==='rack'?'item':sub==='serv'?'serv':''):'rack';
@@ -2265,15 +2265,17 @@ function draw(g){
   const st=$('#stage'),fit=Math.min(innerWidth>900?1.7:1.15,(st.clientWidth-8)/g.W),w=Math.round(g.W*fit*zf);
   st.innerHTML=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${g.W} ${g.H}" width="${w}" height="${Math.round(g.H*w/g.W)}" font-family="Inter, Arial, sans-serif">${g.inner}</svg>`;
 }
-function contagem(r){const c={tot:0,ok:0,sr:0,def:0,swTot:0,swUso:0,swAt:0,swSr:0,nPP:0,ppSz:{}};
+function contagem(r){const c={tot:0,ok:0,sr:0,def:0,swTot:0,swUso:0,swAt:0,swSr:0,nPP:0,ppSz:{},trTot:0,trUso:0,nTr:0};
   r.itens.filter(i=>i.tipo==='patch'&&!i.esp).forEach(p=>{c.tot+=p.portas;c.nPP++;c.ppSz[p.portas]=(c.ppSz[p.portas]||0)+1;Object.values(p.cons).forEach(x=>{if(!x.sw)return;const st=stOf(x);if(st==='ok')c.ok++;else if(st==='livre')c.sr++;else c.def++})});
   const u=usedMap(r);swAll(r).forEach(s=>{c.swTot+=s.portas;for(let p=1;p<=s.portas;p++){const x=u[s.id+'|'+p];if(x){c.swUso++;if((x.st||'ok')==='ok')c.swAt++;else c.swSr++}}});
+  r.itens.filter(i=>i.tipo==='tronco').forEach(t=>{c.trTot+=t.portas;c.nTr++;c.trUso+=trUsed(r,t)});
   c.vag=c.tot-c.ok-c.sr-c.def;return c}
 function hstat(){const el=$('#hstat'),r=cur.tab==='rack'&&rackById(cur.rack);if(!r){el.innerHTML='';return}const c=contagem(r);
   const n=(v,t,cor,ring)=>`<div class="n"><b><i style="${ring?'border:1.5px solid #4b5563':`background:${cor};box-shadow:0 0 7px ${cor}`}"></i>${v}</b><small>${t}</small></div>`;
   const pz=Object.entries(c.ppSz).map(([k,v])=>v>1?`${v}×${k}`:k).join(' + ');
   el.innerHTML=(c.tot?`<div class="hs"><span class="ht">Patch panel<em>${pz} portas</em></span>${n(c.ok+c.sr+c.def,'conectados','#3b82f6')}${n(c.vag,'vagos','',1)}</div>`:'')+
-    (c.swTot?`<div class="hs"><span class="ht">Switch<em>${c.swTot} portas</em></span>${n(c.swAt,'ativas','#4ade80')}${c.swSr?n(c.swSr,'sem rede','#94a3b8'):''}${n(c.swTot-c.swUso,'livres','',1)}</div>`:'');
+    (c.swTot?`<div class="hs"><span class="ht">Switch<em>${c.swTot} portas</em></span>${n(c.swAt,'ativas','#4ade80')}${c.swSr?n(c.swSr,'sem rede','#94a3b8'):''}${n(c.swTot-c.swUso,'livres','',1)}</div>`:'')+
+    (c.trTot?`<div class="hs"><span class="ht">Tronco<em>${c.trTot} portas</em></span>${n(c.trUso,'em uso','#f59e0b')}${n(c.trTot-c.trUso,'livres','',1)}</div>`:'');
   return c}
 function mapRows(r){
   const rows=[];r.itens.filter(i=>i.tipo==='patch').sort((a,b)=>a.u-b.u).forEach(p=>Object.keys(p.cons).map(Number).sort((a,b)=>a-b).forEach(n=>{
@@ -2688,8 +2690,8 @@ function _si(id){
   if(it.tipo==='org')f+=`<div class="fld"><label>Tampa frontal</label>${segHTML('iTampa',[['0','Sem tampa'],['1','Com tampa']],it.tampa?'1':'0','pickTampa')}</div>
     <div class="fld"><label>Minhas tampas salvas</label><div id="tpList"></div></div>
     <div class="fld"><label>Prévia da tampa</label><div id="tpPrev"></div></div>
-    <div class="fld"><label>Texto na tampa (opcional)</label><input id="iTxt" oninput="tpPrev()" value="${esc(it.tampaTxt||'')}" placeholder="Ex.: AgaSense"></div>
-    <div class="fld"><label>Subtítulo (opcional)</label><input id="iSub" oninput="tpPrev()" value="${esc(it.tampaSub||'')}" placeholder="Ex.: Infra Solution"></div>
+    <div class="fld"><label>Texto na tampa (opcional)</label><input id="iTxt" oninput="tpPrev()" value="${esc(it.tampaTxt||'')}" placeholder="Ex.: TechNet"></div>
+    <div class="fld"><label>Subtítulo (opcional)</label><input id="iSub" oninput="tpPrev()" value="${esc(it.tampaSub||'')}" placeholder="Ex.: Soluções em TI"></div>
     <div class="fld"><label>QR Code na tampa</label>${segHTML('iQr',[['','Sem QR Code'],['site','Com QR Code (site)']],it.qr==='site'?'site':'','pickQr')}</div>
     <div class="fld" id="qrUrlF" style="display:${it.qr==='site'?'block':'none'}"><label>Endereço do site</label><input id="iQrUrl" inputmode="url" oninput="tpPrev()" value="${esc(it.qrUrl||'')}" placeholder="https://www.suaempresa.com.br"></div>
     <div class="note" id="qrNote" style="display:${it.qr?'block':'none'};margin-top:-4px">O QR só aparece com a <b>tampa frontal</b> ligada. Ao escanear, o celular abre o site.</div>
@@ -2984,7 +2986,7 @@ function reportSVG(){
   table('LINKS DE FIBRA ÓPTICA',[{t:'ORIGEM',x:56,w:250},{t:'DESTINO',x:310,w:250},{t:'TIPO',x:564,w:90},{t:'DESCRIÇÃO',x:658,w:186}],
     fib.map(f=>[{t:endFull(f.a),fs:11.5,dx:16,pre:yy=>`<circle cx="63" cy="${yy+16}" r="6" fill="${f.cor}" stroke="#0003"/>`},{t:endFull(f.b),fs:11.5},f.tipo,{t:f.desc||'—',fs:12,fill:'#475569'}]));
   closeA();const H=y+20;
-  o.push(`<text x="${W/2}" y="${H-18}" text-anchor="middle" font-size="11.5" fill="#94a3b8">InfraDoc · InfraNetCom — Documentação de infraestrutura</text>`);
+  o.push(`<text x="${W/2}" y="${H-18}" text-anchor="middle" font-size="11.5" fill="#94a3b8">InfraDoc — Documentação de infraestrutura</text>`);
   const defs=`<defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#6366f1"/></linearGradient><radialGradient id="hg" cx=".85" cy="0" r="1"><stop offset="0" stop-color="#22d3ee" stop-opacity=".25"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0"/></radialGradient></defs>`;
   return{W,H,svg:`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Inter, Arial, Helvetica, sans-serif"><rect width="${W}" height="${H}" fill="#fff"/>${defs}${o.join('')}</svg>`,
     parts:{o,defs,headH,headN,g,drawN,listY,listN,atoms,topo,r,fd}};
@@ -3073,7 +3075,7 @@ function listPages(p){const W=900,PH=Math.round(W*841.89/595.28),CT=84,BOT=PH-60
   const N=pages.length,nm=p.topo?'Topologia':p.r.nome;
   return pages.map((els,k)=>`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${PH}" viewBox="0 0 ${W} ${PH}" font-family="Inter"><rect width="${W}" height="${PH}" fill="#fff"/>${p.defs}
     ${k?`<text x="40" y="44" font-size="11.5" font-weight="700" fill="#6b7785">${esc(trunc([S.cliente,nm].filter(Boolean).join(' · '),80))}</text><text x="${W-40}" y="44" text-anchor="end" font-size="11.5" fill="#94a3b8">${p.fd}</text><rect x="40" y="54" width="${W-80}" height="1" fill="#dde3ea"/>`:''}
-    ${els.join('')}<rect x="40" y="${PH-46}" width="${W-80}" height="1" fill="#e3e8ee"/><text x="40" y="${PH-26}" font-size="10.5" fill="#94a3b8">InfraDoc · InfraNetCom — Documentação de infraestrutura</text><text x="${W-40}" y="${PH-26}" text-anchor="end" font-size="10.5" font-weight="700" fill="#6b7785">Página ${k+2} de ${N+1}</text></svg>`)}
+    ${els.join('')}<rect x="40" y="${PH-46}" width="${W-80}" height="1" fill="#e3e8ee"/><text x="40" y="${PH-26}" font-size="10.5" fill="#94a3b8">InfraDoc — Documentação de infraestrutura</text><text x="${W-40}" y="${PH-26}" text-anchor="end" font-size="10.5" font-weight="700" fill="#6b7785">Página ${k+2} de ${N+1}</text></svg>`)}
 async function exportPDFvec(share){if(!window.jspdf||!window.svg2pdf)return exportPDFfile(share);
   toast('Gerando PDF vetorial…');await new Promise(r=>setTimeout(r,40));
   try{const {parts:p}=reportSVG(),pap=EXPAP||papelSug(),[a,b]=PAPEL[pap];
@@ -3222,6 +3224,10 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
     var res=await sb.auth.signUp({email:email,password:pass});
     btn.disabled=false;btn.textContent=orig;
     if(res.error){setErr('sErr',res.error.message);return}
+    if(res.data&&res.data.session){
+      await afterLogin();
+      return;
+    }
     setErr('sErr','Conta criada! Confirma seu e-mail e depois faz login.');
   };
 
