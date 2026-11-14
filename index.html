@@ -3196,7 +3196,11 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
     $a('authLoading').style.display='';
     try{await syncFromCloud()}catch(e){}
     try{sessionStorage.setItem('infradoc_synced','1')}catch(e){}
-    location.reload();
+    if(reloadGuardOk()){
+      location.reload();
+    }else{
+      hideGate();
+    }
   }
 
   async function syncFromCloud(){
@@ -3234,17 +3238,28 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
     },600);
   }
 
+  function reloadGuardOk(){
+    var n=0;
+    try{n=parseInt(sessionStorage.getItem('infradoc_reload_n')||'0',10)||0}catch(e){return false}
+    if(n>=2)return false;
+    try{sessionStorage.setItem('infradoc_reload_n',String(n+1))}catch(e){return false}
+    return true;
+  }
+
   (async function initAuth(){
     var s=await sb.auth.getSession();
     var session=s&&s.data&&s.data.session;
     if(session){
       var already=false;
-      try{already=!!sessionStorage.getItem('infradoc_synced')}catch(e){}
+      try{already=!!sessionStorage.getItem('infradoc_synced')}catch(e){already=true}
       if(!already){
         await syncFromCloud();
         try{sessionStorage.setItem('infradoc_synced','1')}catch(e){}
-        location.reload();
-        return;
+        hideGate();
+        if(reloadGuardOk()){
+          location.reload();
+          return;
+        }
       }
       hideGate();
     }else{
