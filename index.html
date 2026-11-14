@@ -12,7 +12,7 @@
 <meta name="application-name" content="InfraDoc">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>InfraDoc</title>
-<script>if('serviceWorker' in navigator){addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})})}</script>
+<script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(rs=>rs.forEach(r=>r.unregister())).catch(()=>{})}</script>
 <style>
 .door{transition:transform .6s cubic-bezier(.4,0,.2,1);transform-box:view-box}.door .dgl{transition:opacity .45s}.door.open{transform:scaleX(.03)}.door.open .dgl{opacity:0}.door .dh{transition:opacity .3s}.door.open .dh{opacity:0}.dclose{opacity:0;pointer-events:none;transition:opacity .3s .3s}.door.open+.dclose,.door2.open+.dclose{opacity:1;pointer-events:auto}.door2 .dleaf{transition:transform .65s cubic-bezier(.4,0,.2,1);transform-box:view-box}.door2.open .dleaf{transform:scaleX(.03)}.door2 .dgl,.door2 .dh{transition:opacity .4s}.door2.open .dgl,.door2.open .dh{opacity:0}.dcov{transition:transform .5s cubic-bezier(.4,0,.2,1),opacity .4s;transform-box:fill-box;transform-origin:center;cursor:pointer}.dcov.open{opacity:0;pointer-events:none;transform:translateY(-14px) scaleY(.6)}.dcopen{opacity:0;pointer-events:none;transition:opacity .3s .25s;cursor:pointer}.dcov.open+.dcopen{opacity:1;pointer-events:auto}
 :root{--bg:#0f151d;--panel:#161e29;--panel2:#1d2734;--line:#2c3a4d;--ink:#f1f5f9;--mut:#a7b3c2;--acc:#22d3ee;--acc2:#3b82f6;--ok:#34d399;--warn:#f59e0b;--bad:#f87171}
