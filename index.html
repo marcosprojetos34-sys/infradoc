@@ -356,6 +356,19 @@ body.authlocked{overflow:hidden}
       <div class="autherr" id="rErr"></div>
     </div>
 
+    <div id="authNewPw" class="authform" style="display:none">
+      <label>Nova senha</label>
+      <div class="pwwrap">
+        <input type="password" id="nPass" autocomplete="new-password" placeholder="••••••••" oninput="pwStrength2(this.value)">
+        <button type="button" class="eye" onclick="togglePw('nPass',this)">👁</button>
+      </div>
+      <div class="pwrules" id="pwRules2">
+        <span data-r="len">8+ caracteres</span><span data-r="up">Maiúscula</span><span data-r="low">Minúscula</span><span data-r="num">Número</span><span data-r="sp">Caractere especial</span>
+      </div>
+      <button class="authbtn" onclick="authSetNewPassword()">Salvar nova senha</button>
+      <div class="autherr" id="nErr"></div>
+    </div>
+
     <div id="authLoading" style="display:none">Carregando seus dados…</div>
   </div>
 </div>
@@ -3124,12 +3137,19 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
   var sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
   window._sb=sb;
 
+  sb.auth.onAuthStateChange(function(event,session){
+    if(event==='PASSWORD_RECOVERY'){
+      showGate();
+      showAuth('newpw');
+    }
+  });
+
   function $a(id){return document.getElementById(id)}
 
   window.showAuth=function(which){
-    ['Login','Signup','Reset'].forEach(function(k){var el=$a('auth'+k);if(el)el.style.display=(k.toLowerCase()===which)?'':'none'});
-    var e1=$a('aErr'),e2=$a('sErr'),e3=$a('rErr');
-    if(e1)e1.textContent='';if(e2)e2.textContent='';if(e3)e3.textContent='';
+    ['Login','Signup','Reset','NewPw'].forEach(function(k){var el=$a('auth'+k);if(el)el.style.display=(k.toLowerCase()===which)?'':'none'});
+    var e1=$a('aErr'),e2=$a('sErr'),e3=$a('rErr'),e4=$a('nErr');
+    if(e1)e1.textContent='';if(e2)e2.textContent='';if(e3)e3.textContent='';if(e4)e4.textContent='';
   };
 
   window.togglePw=function(id,btn){
@@ -3144,6 +3164,22 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
     var r=checkPw(v);
     var nodes=document.querySelectorAll('#pwRules span');
     for(var i=0;i<nodes.length;i++){var s=nodes[i],k=s.getAttribute('data-r');s.classList.toggle('ok',!!r[k])}
+  };
+  window.pwStrength2=function(v){
+    var r=checkPw(v);
+    var nodes=document.querySelectorAll('#pwRules2 span');
+    for(var i=0;i<nodes.length;i++){var s=nodes[i],k=s.getAttribute('data-r');s.classList.toggle('ok',!!r[k])}
+  };
+  window.authSetNewPassword=async function(){
+    setErr('nErr','');
+    var pass=$a('nPass').value;
+    if(!pwValid(pass)){setErr('nErr','Senha fraca — siga as regras acima');return}
+    var btn=event.target;btn.disabled=true;var orig=btn.textContent;btn.textContent='Salvando…';
+    var res=await sb.auth.updateUser({password:pass});
+    btn.disabled=false;btn.textContent=orig;
+    if(res.error){setErr('nErr',res.error.message);return}
+    try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+    await afterLogin();
   };
   function pwValid(v){var r=checkPw(v);return r.len&&r.up&&r.low&&r.num&&r.sp}
 
