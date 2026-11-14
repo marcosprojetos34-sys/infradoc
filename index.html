@@ -285,27 +285,35 @@ body.light .curl svg path:nth-of-type(1){fill:#fff;stroke:#cbd5e1}body.light .cu
 .thm{width:38px;font-size:17px}
 
 /* === InfraDoc Cloud Auth === */
+@keyframes authFadeIn{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes authSpin{to{transform:rotate(360deg)}}
 .authgate{position:fixed;inset:0;z-index:99999;background:radial-gradient(1100px 520px at 50% -180px,#12344d 0%,var(--bg) 62%);display:flex;align-items:center;justify-content:center;padding:20px}
-.authcard{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
-.authcard h1{margin:12px 0 2px;font-size:22px;color:var(--ink);text-align:center}
-.authlogosv{display:block;margin:0 auto;width:56px;height:56px}
-.authsub{margin:0 0 20px;text-align:center;color:var(--mut);font-size:13px}
-.authform label{display:block;font-size:12px;color:var(--mut);margin:14px 0 6px}
-.authform input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 12px;font-size:15px;outline:none}
-.authform input:focus{border-color:var(--acc)}
+.authcard{position:relative;width:100%;max-width:380px;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:20px;padding:32px 26px 28px;box-shadow:0 24px 70px rgba(0,0,0,.45),0 1px 0 rgba(255,255,255,.04) inset;animation:authFadeIn .35s ease both}
+.authcard::before{content:'';position:absolute;top:0;left:14%;right:14%;height:3px;border-radius:0 0 6px 6px;background:linear-gradient(90deg,var(--acc),var(--acc2));opacity:.9}
+.authcard h1{margin:14px 0 2px;font-size:23px;letter-spacing:.2px;color:var(--ink);text-align:center;font-weight:800}
+.authlogosv{display:block;margin:0 auto;width:58px;height:58px;filter:drop-shadow(0 6px 16px rgba(34,211,238,.25))}
+.authsub{margin:0 0 22px;text-align:center;color:var(--mut);font-size:13px}
+.authform label{display:block;font-size:12px;color:var(--mut);margin:14px 0 6px;font-weight:600;letter-spacing:.2px}
+.authform input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:11px;color:var(--ink);padding:12px 13px;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
+.authform input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(34,211,238,.15)}
 .pwwrap{position:relative}
-.pwwrap input{padding-right:42px}
-.pwwrap .eye{position:absolute;right:4px;top:4px;bottom:4px;width:34px;background:transparent;border:0;color:var(--mut);cursor:pointer;font-size:16px}
-.authbtn{width:100%;margin-top:18px;padding:12px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04121a;font-weight:700;font-size:15px;cursor:pointer}
-.authbtn:disabled{opacity:.6;cursor:default}
-.authlinks{display:flex;justify-content:space-between;margin-top:14px;font-size:12.5px}
-.authlinks a{color:var(--acc);cursor:pointer;text-decoration:none}
-.authlinks a:hover{text-decoration:underline}
-.autherr{min-height:18px;margin-top:10px;font-size:12.5px;color:var(--warn);text-align:center}
+.pwwrap input{padding-right:44px}
+.pwwrap .eye{position:absolute;right:3px;top:3px;bottom:3px;width:38px;display:flex;align-items:center;justify-content:center;background:transparent;border:0;border-radius:8px;color:var(--mut);cursor:pointer;transition:color .15s,background .15s}
+.pwwrap .eye:hover{color:var(--acc);background:rgba(255,255,255,.04)}
+.pwwrap .eye svg{display:block}
+.authbtn{position:relative;width:100%;margin-top:20px;padding:13px;border:0;border-radius:11px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04121a;font-weight:700;font-size:15px;cursor:pointer;transition:filter .15s,transform .05s;box-shadow:0 8px 24px rgba(34,211,238,.18)}
+.authbtn:hover:not(:disabled){filter:brightness(1.07)}
+.authbtn:active:not(:disabled){transform:translateY(1px)}
+.authbtn:disabled{opacity:.65;cursor:default}
+.authlinks{display:flex;justify-content:space-between;margin-top:16px;font-size:12.5px}
+.authlinks a{color:var(--acc);cursor:pointer;text-decoration:none;transition:opacity .15s}
+.authlinks a:hover{text-decoration:underline;opacity:.85}
+.autherr{min-height:18px;margin-top:12px;font-size:12.5px;color:var(--warn);text-align:center;line-height:1.4}
 .pwrules{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.pwrules span{font-size:11px;padding:4px 8px;border-radius:20px;background:var(--panel2);color:var(--mut);border:1px solid var(--line)}
+.pwrules span{font-size:11px;padding:4px 9px;border-radius:20px;background:var(--panel2);color:var(--mut);border:1px solid var(--line);transition:background .2s,color .2s,border-color .2s}
 .pwrules span.ok{background:rgba(52,211,153,.15);color:var(--ok);border-color:var(--ok)}
-#authLoading{text-align:center;color:var(--mut);padding:30px 0;font-size:14px}
+#authLoading{text-align:center;color:var(--mut);padding:34px 0 10px;font-size:14px;display:flex;flex-direction:column;align-items:center;gap:12px}
+#authLoading::before{content:'';width:26px;height:26px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--acc);animation:authSpin .7s linear infinite}
 body.authlocked{overflow:hidden}
 </style>
 </head>
@@ -322,7 +330,7 @@ body.authlocked{overflow:hidden}
       <label>Senha</label>
       <div class="pwwrap">
         <input type="password" id="aPass" autocomplete="current-password" placeholder="••••••••">
-        <button type="button" class="eye" onclick="togglePw('aPass',this)">👁</button>
+        <button type="button" class="eye" onclick="togglePw('aPass',this)" aria-label="Mostrar senha"><svg class="ic-eye" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ic-eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg></button>
       </div>
       <button class="authbtn" onclick="authLogin()">Entrar</button>
       <div class="authlinks">
@@ -338,7 +346,7 @@ body.authlocked{overflow:hidden}
       <label>Senha</label>
       <div class="pwwrap">
         <input type="password" id="sPass" autocomplete="new-password" placeholder="••••••••" oninput="pwStrength(this.value)">
-        <button type="button" class="eye" onclick="togglePw('sPass',this)">👁</button>
+        <button type="button" class="eye" onclick="togglePw('sPass',this)" aria-label="Mostrar senha"><svg class="ic-eye" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ic-eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg></button>
       </div>
       <div class="pwrules" id="pwRules">
         <span data-r="len">8+ caracteres</span><span data-r="up">Maiúscula</span><span data-r="low">Minúscula</span><span data-r="num">Número</span><span data-r="sp">Caractere especial</span>
@@ -360,7 +368,7 @@ body.authlocked{overflow:hidden}
       <label>Nova senha</label>
       <div class="pwwrap">
         <input type="password" id="nPass" autocomplete="new-password" placeholder="••••••••" oninput="pwStrength2(this.value)">
-        <button type="button" class="eye" onclick="togglePw('nPass',this)">👁</button>
+        <button type="button" class="eye" onclick="togglePw('nPass',this)" aria-label="Mostrar senha"><svg class="ic-eye" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"/><circle cx="12" cy="12" r="3"/></svg><svg class="ic-eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.6 21.6 0 0 1 5.06-6.06M9.9 4.24A10.4 10.4 0 0 1 12 4c7 0 11 7 11 7a21.6 21.6 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><path d="M1 1l22 22"/></svg></button>
       </div>
       <div class="pwrules" id="pwRules2">
         <span data-r="len">8+ caracteres</span><span data-r="up">Maiúscula</span><span data-r="low">Minúscula</span><span data-r="num">Número</span><span data-r="sp">Caractere especial</span>
@@ -3154,7 +3162,16 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
 
   window.togglePw=function(id,btn){
     var i=$a(id);
-    if(i.type==='password'){i.type='text';btn.textContent='🙈'}else{i.type='password';btn.textContent='👁'}
+    var eOn=btn.querySelector('.ic-eye'),eOff=btn.querySelector('.ic-eye-off');
+    if(i.type==='password'){
+      i.type='text';
+      if(eOn)eOn.style.display='none';
+      if(eOff)eOff.style.display='';
+    }else{
+      i.type='password';
+      if(eOn)eOn.style.display='';
+      if(eOff)eOff.style.display='none';
+    }
   };
 
   function checkPw(v){
