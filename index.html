@@ -2040,7 +2040,7 @@ function renderHome(){
   if(cur.level==='emp'){
     $('#pName').textContent='InfraDoc';$('#pSub').textContent=`${DB.empresas.length} empresa${DB.empresas.length===1?'':'s'} · documentação de infraestrutura`;
     fab.style.display='';fab.title='Nova empresa';fab.onclick=()=>sheetEmp();
-    m.innerHTML=`<div class="bar"><span class="pgt">Empresas</span><span class="bart">toque para abrir</span><button class="ib sm" style="margin-left:auto" onclick="exportDB()" title="Backup completo">⤓<span class="lg"> Backup</span></button><button class="ib sm" onclick="$('#fileIn').click()" title="Restaurar backup">⤒<span class="lg"> Restaurar</span></button><button class="ib sm" onclick="exportApp()" title="Baixar o sistema já com seus dados dentro">💾<span class="lg"> Sistema + dados</span></button></div>
+    m.innerHTML=`<div class="bar"><span class="pgt">Empresas</span><span class="bart">toque para abrir</span><button class="ib sm" style="margin-left:auto" onclick="exportDB()" title="Backup completo">⤓<span class="lg"> Backup</span></button><button class="ib sm" onclick="$('#fileIn').click()" title="Restaurar backup">⤒<span class="lg"> Restaurar</span></button><button class="ib sm" onclick="exportApp()" title="Baixar o sistema já com seus dados dentro">💾<span class="lg"> Sistema + dados</span></button>${window._loggedIn?`<button class="ib sm" onclick="arm(this,()=>window.authLogout&&window.authLogout(),'Toque de novo: sai da conta e volta para a tela de login')" title="Sair da conta">⎋<span class="lg"> Sair</span></button>`:''}</div>
     ${DB._demo?`<div class="note" style="margin:0 14px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1;min-width:200px"><b>Já usava o InfraDoc em outro arquivo?</b> Traga suas empresas tocando em Restaurar e escolhendo o backup (.json).</span><button class="ib pri" style="height:38px" onclick="$('#fileIn').click()">⤒ Restaurar backup</button></div>`:''}
     <div class="rgrid">${DB.empresas.map(e=>{const h=hue(e.nome),np=e.projetos.length,nr=e.projetos.reduce((a,p)=>a+(p.racks||[]).length,0);
       return `<button class="rcard ecard" style="--a:${EACC[e.tipo]||EACC.escritorio}" onclick="pageIn(()=>{cur.level='proj';cur.emp='${e.id}'})"><span class="etag">${etLabel(e.tipo)}</span><span class="emore" title="Editar ou excluir empresa" onclick="event.stopPropagation();sheetEmp('${e.id}')">⋯</span><div class="rc-art">${bld(e.tipo,e.id,'c'+e.id)}</div><div class="rc-t"><b>${esc(e.nome)}</b><small>${esc([e.cidade,e.rede&&('Rede: '+e.rede)].filter(Boolean).join(' · ')||'—')}</small></div><div class="epills"><span><b>${np}</b> projeto${np===1?'':'s'}</span><span><b>${nr}</b> rack${nr===1?'':'s'}</span></div></button>`}).join('')}
@@ -3153,6 +3153,8 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
       showGate();
       showAuth('newpw');
     }
+    window._loggedIn=!!session;
+    if(typeof render==='function')try{render()}catch(e){}
   });
 
   function $a(id){return document.getElementById(id)}
@@ -3309,6 +3311,7 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
   (async function initAuth(){
     var s=await sb.auth.getSession();
     var session=s&&s.data&&s.data.session;
+    window._loggedIn=!!session;
     if(session){
       var already=false;
       try{already=!!sessionStorage.getItem('infradoc_synced')}catch(e){already=true}
@@ -3330,6 +3333,7 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
       window.save=function(){_origSave();cloudSave()};
       window._saveWrapped=true;
     }
+    if(typeof render==='function')try{render()}catch(e){}
   })();
 })();
 </script>
