@@ -283,9 +283,83 @@ body.light .rtp{background:#f8fafc;color:var(--mut)}body.light .rtp.on{backgroun
 body.light .foot{color:#94a3b8}
 body.light .curl svg path:nth-of-type(1){fill:#fff;stroke:#cbd5e1}body.light .curl svg path:last-of-type{stroke:#0f172a}body.light .curl span{color:var(--ink)}
 .thm{width:38px;font-size:17px}
+
+/* === InfraDoc Cloud Auth === */
+.authgate{position:fixed;inset:0;z-index:99999;background:radial-gradient(1100px 520px at 50% -180px,#12344d 0%,var(--bg) 62%);display:flex;align-items:center;justify-content:center;padding:20px}
+.authcard{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px 24px;box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.authcard h1{margin:12px 0 2px;font-size:22px;color:var(--ink);text-align:center}
+.authlogosv{display:block;margin:0 auto;width:56px;height:56px}
+.authsub{margin:0 0 20px;text-align:center;color:var(--mut);font-size:13px}
+.authform label{display:block;font-size:12px;color:var(--mut);margin:14px 0 6px}
+.authform input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 12px;font-size:15px;outline:none}
+.authform input:focus{border-color:var(--acc)}
+.pwwrap{position:relative}
+.pwwrap input{padding-right:42px}
+.pwwrap .eye{position:absolute;right:4px;top:4px;bottom:4px;width:34px;background:transparent;border:0;color:var(--mut);cursor:pointer;font-size:16px}
+.authbtn{width:100%;margin-top:18px;padding:12px;border:0;border-radius:10px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04121a;font-weight:700;font-size:15px;cursor:pointer}
+.authbtn:disabled{opacity:.6;cursor:default}
+.authlinks{display:flex;justify-content:space-between;margin-top:14px;font-size:12.5px}
+.authlinks a{color:var(--acc);cursor:pointer;text-decoration:none}
+.authlinks a:hover{text-decoration:underline}
+.autherr{min-height:18px;margin-top:10px;font-size:12.5px;color:var(--warn);text-align:center}
+.pwrules{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pwrules span{font-size:11px;padding:4px 8px;border-radius:20px;background:var(--panel2);color:var(--mut);border:1px solid var(--line)}
+.pwrules span.ok{background:rgba(52,211,153,.15);color:var(--ok);border-color:var(--ok)}
+#authLoading{text-align:center;color:var(--mut);padding:30px 0;font-size:14px}
+body.authlocked{overflow:hidden}
 </style>
 </head>
 <body>
+<div id="authGate" class="authgate" style="display:none">
+  <div class="authcard">
+    <svg class="authlogosv" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><defs><linearGradient id="gLogoAuth" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs><rect x="4" y="4" width="88" height="88" rx="22" fill="url(#gLogoAuth)"/><rect x="14" y="14" width="68" height="68" rx="14" fill="#0b1016" fill-opacity=".22"/><rect x="32" y="26" width="10" height="44" rx="3" fill="#06202a"/><path d="M48 26h10c12 0 18 9 18 22s-6 22-18 22H48z M58 36v24c5 0 8-4 8-12s-3-12-8-12z" fill="#06202a" fill-rule="evenodd"/></svg>
+    <h1>InfraDoc</h1>
+    <p class="authsub">Documentação visual de racks</p>
+
+    <div id="authLogin" class="authform">
+      <label>E-mail</label>
+      <input type="email" id="aEmail" autocomplete="username" placeholder="seu@email.com">
+      <label>Senha</label>
+      <div class="pwwrap">
+        <input type="password" id="aPass" autocomplete="current-password" placeholder="••••••••">
+        <button type="button" class="eye" onclick="togglePw('aPass',this)">👁</button>
+      </div>
+      <button class="authbtn" onclick="authLogin()">Entrar</button>
+      <div class="authlinks">
+        <a onclick="showAuth('signup')">Criar conta</a>
+        <a onclick="showAuth('reset')">Esqueci minha senha</a>
+      </div>
+      <div class="autherr" id="aErr"></div>
+    </div>
+
+    <div id="authSignup" class="authform" style="display:none">
+      <label>E-mail</label>
+      <input type="email" id="sEmail" autocomplete="username" placeholder="seu@email.com">
+      <label>Senha</label>
+      <div class="pwwrap">
+        <input type="password" id="sPass" autocomplete="new-password" placeholder="••••••••" oninput="pwStrength(this.value)">
+        <button type="button" class="eye" onclick="togglePw('sPass',this)">👁</button>
+      </div>
+      <div class="pwrules" id="pwRules">
+        <span data-r="len">8+ caracteres</span><span data-r="up">Maiúscula</span><span data-r="low">Minúscula</span><span data-r="num">Número</span><span data-r="sp">Caractere especial</span>
+      </div>
+      <button class="authbtn" onclick="authSignup()">Criar conta</button>
+      <div class="authlinks"><span></span><a onclick="showAuth('login')">Já tenho conta</a></div>
+      <div class="autherr" id="sErr"></div>
+    </div>
+
+    <div id="authReset" class="authform" style="display:none">
+      <label>E-mail</label>
+      <input type="email" id="rEmail" placeholder="seu@email.com">
+      <button class="authbtn" onclick="authReset()">Enviar link de recuperação</button>
+      <div class="authlinks"><span></span><a onclick="showAuth('login')">Voltar para login</a></div>
+      <div class="autherr" id="rErr"></div>
+    </div>
+
+    <div id="authLoading" style="display:none">Carregando seus dados…</div>
+  </div>
+</div>
+
 <header class="top">
   <div class="logo" aria-label="InfraDoc"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><defs><linearGradient id="gLogoHdr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs><rect x="4" y="4" width="88" height="88" rx="22" fill="url(#gLogoHdr)"/><rect x="14" y="14" width="68" height="68" rx="14" fill="#0b1016" fill-opacity=".22"/><g fill="#06202a" fill-opacity=".55"><rect x="20" y="24" width="4" height="4" rx="1"/><rect x="20" y="36" width="4" height="4" rx="1"/><rect x="20" y="48" width="4" height="4" rx="1"/><rect x="20" y="60" width="4" height="4" rx="1"/><rect x="20" y="72" width="4" height="4" rx="1"/><rect x="72" y="24" width="4" height="4" rx="1"/><rect x="72" y="36" width="4" height="4" rx="1"/><rect x="72" y="48" width="4" height="4" rx="1"/><rect x="72" y="60" width="4" height="4" rx="1"/><rect x="72" y="72" width="4" height="4" rx="1"/></g><rect x="32" y="26" width="10" height="44" rx="3" fill="#06202a"/><path d="M48 26h10c12 0 18 9 18 22s-6 22-18 22H48z M58 36v24c5 0 8-4 8-12s-3-12-8-12z" fill="#06202a" fill-rule="evenodd"/><rect x="32" y="74" width="34" height="3" rx="1.5" fill="#06202a" fill-opacity=".5"/></svg></div>
   <div class="proj" onclick="if(cur.level==='app')sheetPr(cur.proj);else if(cur.level==='proj')sheetEmp(cur.emp)"><b id="pName"></b><small id="pSub"></small></div>
@@ -3037,6 +3111,152 @@ function runSearch(){const r=rackById(cur.rack);if(!r)return;SQ=$('#sQ').value;c
 try{if(localStorage.getItem('infradoc_tema')==='light'){document.body.classList.add('light');$('#thmBtn').textContent='☾'}}catch(e){}
 render();qrFromURL();
 try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segure e arraste uma porta para mover o cabo'),1200);localStorage.setItem('infradoc_dica','1')}}catch(e){}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  var SUPA_URL='https://oejraiokjbwdarltloap.supabase.co';
+  var SUPA_KEY='sb_publishable_IXV8wGqYDSkrvDCc9z80Yg_4sotKiY0';
+  if(!window.supabase||typeof window.supabase.createClient!=='function'){
+    console.warn('InfraDoc: biblioteca da nuvem nao carregou (sem internet ou bloqueada). Seguindo so com salvamento local.');
+    return;
+  }
+  var sb=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+  window._sb=sb;
+
+  function $a(id){return document.getElementById(id)}
+
+  window.showAuth=function(which){
+    ['Login','Signup','Reset'].forEach(function(k){var el=$a('auth'+k);if(el)el.style.display=(k.toLowerCase()===which)?'':'none'});
+    var e1=$a('aErr'),e2=$a('sErr'),e3=$a('rErr');
+    if(e1)e1.textContent='';if(e2)e2.textContent='';if(e3)e3.textContent='';
+  };
+
+  window.togglePw=function(id,btn){
+    var i=$a(id);
+    if(i.type==='password'){i.type='text';btn.textContent='🙈'}else{i.type='password';btn.textContent='👁'}
+  };
+
+  function checkPw(v){
+    return{len:v.length>=8,up:/[A-Z]/.test(v),low:/[a-z]/.test(v),num:/[0-9]/.test(v),sp:/[^A-Za-z0-9]/.test(v)};
+  }
+  window.pwStrength=function(v){
+    var r=checkPw(v);
+    var nodes=document.querySelectorAll('#pwRules span');
+    for(var i=0;i<nodes.length;i++){var s=nodes[i],k=s.getAttribute('data-r');s.classList.toggle('ok',!!r[k])}
+  };
+  function pwValid(v){var r=checkPw(v);return r.len&&r.up&&r.low&&r.num&&r.sp}
+
+  function setErr(id,msg){var el=$a(id);if(el)el.textContent=msg||''}
+
+  window.authLogin=async function(){
+    setErr('aErr','');
+    var email=$a('aEmail').value.trim(),pass=$a('aPass').value;
+    if(!email||!pass){setErr('aErr','Preenche e-mail e senha');return}
+    var btn=event.target;btn.disabled=true;var orig=btn.textContent;btn.textContent='Entrando…';
+    var res=await sb.auth.signInWithPassword({email:email,password:pass});
+    btn.disabled=false;btn.textContent=orig;
+    if(res.error){setErr('aErr',res.error.message==='Invalid login credentials'?'E-mail ou senha incorretos':res.error.message);return}
+    await afterLogin();
+  };
+
+  window.authSignup=async function(){
+    setErr('sErr','');
+    var email=$a('sEmail').value.trim(),pass=$a('sPass').value;
+    if(!email||!pass){setErr('sErr','Preenche e-mail e senha');return}
+    if(!pwValid(pass)){setErr('sErr','Senha fraca — siga as regras acima');return}
+    var btn=event.target;btn.disabled=true;var orig=btn.textContent;btn.textContent='Criando…';
+    var res=await sb.auth.signUp({email:email,password:pass});
+    btn.disabled=false;btn.textContent=orig;
+    if(res.error){setErr('sErr',res.error.message);return}
+    setErr('sErr','Conta criada! Confirma seu e-mail e depois faz login.');
+  };
+
+  window.authReset=async function(){
+    setErr('rErr','');
+    var email=$a('rEmail').value.trim();
+    if(!email){setErr('rErr','Preenche o e-mail');return}
+    var btn=event.target;btn.disabled=true;var orig=btn.textContent;btn.textContent='Enviando…';
+    var res=await sb.auth.resetPasswordForEmail(email);
+    btn.disabled=false;btn.textContent=orig;
+    if(res.error){setErr('rErr',res.error.message);return}
+    setErr('rErr','Link enviado! Confere seu e-mail.');
+  };
+
+  window.authLogout=async function(){
+    await sb.auth.signOut();
+    try{sessionStorage.removeItem('infradoc_synced')}catch(e){}
+    location.reload();
+  };
+
+  async function afterLogin(){
+    $a('authLogin').style.display='none';
+    $a('authSignup').style.display='none';
+    $a('authReset').style.display='none';
+    $a('authLoading').style.display='';
+    try{await syncFromCloud()}catch(e){}
+    try{sessionStorage.setItem('infradoc_synced','1')}catch(e){}
+    location.reload();
+  }
+
+  async function syncFromCloud(){
+    var u=await sb.auth.getUser();
+    var user=u&&u.data&&u.data.user;
+    if(!user)return;
+    var r=await sb.from('infradoc_data').select('data,updated_at').eq('user_id',user.id).maybeSingle();
+    if(r.error||!r.data||!r.data.data)return;
+    var cloud=r.data.data;
+    var useCloud=true;
+    try{
+      var local=JSON.parse(localStorage.getItem(DBKEY));
+      if(local&&local.savedAt&&cloud.savedAt&&local.savedAt>=cloud.savedAt)useCloud=false;
+    }catch(e){}
+    if(useCloud){
+      try{localStorage.setItem(DBKEY,JSON.stringify(cloud))}catch(e){}
+    }
+  }
+
+  function hideGate(){var g=$a('authGate');if(g)g.style.display='none';document.body.classList.remove('authlocked')}
+  function showGate(){var g=$a('authGate');if(g)g.style.display='';document.body.classList.add('authlocked')}
+
+  var saveTimer=null;
+  function cloudSave(){
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(async function(){
+      try{
+        var u=await sb.auth.getUser();
+        var user=u&&u.data&&u.data.user;
+        if(!user)return;
+        var db=JSON.parse(localStorage.getItem(DBKEY));
+        if(!db)return;
+        await sb.from('infradoc_data').upsert({user_id:user.id,data:db,updated_at:new Date().toISOString()});
+      }catch(e){console.warn('InfraDoc: falha ao salvar na nuvem',e)}
+    },600);
+  }
+
+  (async function initAuth(){
+    var s=await sb.auth.getSession();
+    var session=s&&s.data&&s.data.session;
+    if(session){
+      var already=false;
+      try{already=!!sessionStorage.getItem('infradoc_synced')}catch(e){}
+      if(!already){
+        await syncFromCloud();
+        try{sessionStorage.setItem('infradoc_synced','1')}catch(e){}
+        location.reload();
+        return;
+      }
+      hideGate();
+    }else{
+      showGate();
+    }
+    if(typeof window.save==='function'&&!window._saveWrapped){
+      var _origSave=window.save;
+      window.save=function(){_origSave();cloudSave()};
+      window._saveWrapped=true;
+    }
+  })();
+})();
 </script>
 </body>
 </html>
