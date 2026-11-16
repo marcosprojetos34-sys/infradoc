@@ -293,7 +293,26 @@ body.light .curl svg path:nth-of-type(1){fill:#fff;stroke:#cbd5e1}body.light .cu
 .authcard::before{content:'';position:absolute;top:0;left:14%;right:14%;height:3px;border-radius:0 0 6px 6px;background:linear-gradient(90deg,var(--acc),var(--acc2));opacity:.9}
 .authcard h1{margin:14px 0 2px;font-size:23px;letter-spacing:.2px;color:var(--ink);text-align:center;font-weight:800}
 .authlogosv{display:block;margin:0 auto;width:58px;height:58px;filter:drop-shadow(0 6px 16px rgba(34,211,238,.25))}
-.authsub{margin:0 0 22px;text-align:center;color:var(--mut);font-size:13px}
+.authsub{margin:0 0 18px;text-align:center;color:var(--mut);font-size:13px}
+.planrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 22px}
+.plancard{position:relative;border:1px solid var(--line);border-radius:14px;padding:14px 12px 13px;background:var(--panel2)}
+.plancard .ptag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--mut);text-transform:uppercase}
+.plancard .pprice{margin:6px 0 2px;font-size:18px;font-weight:800;color:var(--ink)}
+.plancard .ptrial{margin:0 0 10px;font-size:11px;font-weight:700;color:var(--ok)}
+.plancard .pprice small{font-size:11px;font-weight:600;color:var(--mut)}
+.plancard ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px}
+.plancard li{font-size:11.5px;color:var(--mut);display:flex;gap:6px;align-items:flex-start;line-height:1.35}
+.plancard li::before{content:'✓';color:var(--ok);font-weight:800;flex:0 0 auto}
+.plancard.prem{border-color:transparent;background:linear-gradient(180deg,rgba(34,211,238,.1),var(--panel2));box-shadow:0 0 0 1.5px var(--acc) inset}
+.plancard.prem .ptag{color:var(--acc)}
+.plancard.prem li::before{color:var(--acc)}
+.planbtn{width:100%;margin-top:10px;padding:8px;border:0;border-radius:9px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04121a;font-weight:800;font-size:11.5px;cursor:pointer}
+.planbtn:hover{filter:brightness(1.07)}
+.planbadge{position:absolute;top:-9px;right:10px;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#04121a;font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:3px 8px;border-radius:20px;text-transform:uppercase;box-shadow:0 4px 10px rgba(34,211,238,.35)}
+@media(max-width:360px){.planrow{grid-template-columns:1fr}}
+.planrow-single{grid-template-columns:1fr;max-width:260px;margin-left:auto;margin-right:auto}
+.planrow-single .plancard{text-align:left}
+.planrow-single .pprice{font-size:22px}
 .authform label{display:block;font-size:12px;color:var(--mut);margin:14px 0 6px;font-weight:600;letter-spacing:.2px}
 .authform input{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:11px;color:var(--ink);padding:12px 13px;font-size:15px;outline:none;transition:border-color .15s,box-shadow .15s}
 .authform input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(34,211,238,.15)}
@@ -324,6 +343,17 @@ body.authlocked{overflow:hidden}
     <svg class="authlogosv" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><defs><linearGradient id="gLogoAuth" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#22d3ee"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs><rect x="4" y="4" width="88" height="88" rx="22" fill="url(#gLogoAuth)"/><rect x="14" y="14" width="68" height="68" rx="14" fill="#0b1016" fill-opacity=".22"/><rect x="32" y="26" width="10" height="44" rx="3" fill="#06202a"/><path d="M48 26h10c12 0 18 9 18 22s-6 22-18 22H48z M58 36v24c5 0 8-4 8-12s-3-12-8-12z" fill="#06202a" fill-rule="evenodd"/></svg>
     <h1>InfraDoc</h1>
     <p class="authsub">Documentação visual de racks</p>
+
+    <div class="planrow planrow-single">
+      <div class="plancard prem">
+        <span class="planbadge">Acesso completo</span>
+        <span class="ptag">InfraDoc</span>
+        <div class="pprice">R$ 197<small> /mês</small></div>
+        <div class="ptrial">🎁 15 dias grátis para testar</div>
+        <ul><li>Rack desenhado e organizado visualmente</li><li>Etiquetas com QR code em cada ponto</li><li>Rota do cabo marcada na planta baixa</li><li>Sincronização em nuvem</li></ul>
+        <button type="button" class="planbtn" onclick="openPremium()">Começar teste grátis de 15 dias</button>
+      </div>
+    </div>
 
     <div id="authLogin" class="authform">
       <label>E-mail</label>
@@ -1885,13 +1915,15 @@ function lbCtrls(){const o=DB.lbOpt||{},f=+o.fita||12;return`<div class="two"><d
 function findPoint(code){const [pj,pi,n]=String(code||'').split('.');for(const e of DB.empresas||[])for(const p of e.projetos||[]){if(p.id!==pj)continue;for(const r of p.racks||[]){const it=(r.itens||[]).find(i=>i.id===pi);if(it)return{e,p,r,it,n:+n}}}return null}
 function qrClose(){const c=$('#qrc');if(c)c.remove();HL=new Set();const r=S&&cur.rack?rackById(cur.rack):null,st=$('#stage');if(r&&st&&st.firstChild)draw(rackSVG(r,true))}
 function openByQR(code){qrClose();const f=findPoint(code);
-  if(!f){toast('Ponto não encontrado neste aparelho');document.body.insertAdjacentHTML('beforeend',`<div class="qrc" id="qrc"><span class="cd" style="background:#f87171"></span><div><b>Ponto não encontrado</b><small>Código ${esc(code)} · o projeto não está neste aparelho ou o ponto foi excluído</small></div><button class="ib" onclick="qrClose()">Fechar</button></div>`);return}
+  if(!f){toast('Ponto não encontrado neste aparelho');document.body.insertAdjacentHTML('beforeend',`<div class="qrc" id="qrc"><span class="cd" style="background:#f87171"></span><div><b>Ponto não encontrado</b><small>Código ${esc(code)} · o projeto não está neste aparelho ou o ponto foi excluído</small></div><button class="ib" onclick="qrDismiss()">Fechar</button></div>`);return}
   if(cur.level==='app'&&S&&S.id===f.p.id){}else openProj(f.e.id,f.p.id);
   cur.tab='rack';cur.rack=f.r.id;cur.sub='rack';HL=new Set([f.it.id+'|'+f.n]);render();
   setTimeout(()=>{const st=$('#stage');if(st&&st.firstChild)draw(rackSVG(f.r,true));const h=st&&st.querySelector('.hlr');if(h)h.scrollIntoView({behavior:'smooth',block:'center'});
     const c=f.it.cons[f.n]||{},sw=itemById(f.r,c.sw),td=c.sw?trDest(f.r,c):null;
-    document.body.insertAdjacentHTML('beforeend',`<div class="qrc" id="qrc"><span class="cd" style="background:${c.cor||'#334155'};box-shadow:0 0 12px ${c.cor||'transparent'}"></span><div><b>${esc(ptId(f.it,f.n))}</b><small>${esc(f.r.nome)}${f.r.local?' · '+esc(f.r.local):''}${c.loc?' · '+esc(c.loc):''}</small><small>${td?'⇄ '+esc(td.txt):sw?'→ '+esc(sw.nome)+' · porta '+esc(String(portLab(sw,c.porta))):'sem switch'}${c.eq?' · '+esc(c.eq):''}${c.st&&ST[c.st]?' · '+ST[c.st]:''}</small></div><button class="ib pri" onclick="sheetPatch('${f.it.id}',${f.n})">Ficha</button><button class="ib" onclick="qrClose()">✕</button></div>`)},200)}
+    document.body.insertAdjacentHTML('beforeend',`<div class="qrc" id="qrc"><span class="cd" style="background:${c.cor||'#334155'};box-shadow:0 0 12px ${c.cor||'transparent'}"></span><div><b>${esc(ptId(f.it,f.n))}</b><small>${esc(f.r.nome)}${f.r.local?' · '+esc(f.r.local):''}${c.loc?' · '+esc(c.loc):''}</small><small>${td?'⇄ '+esc(td.txt):sw?'→ '+esc(sw.nome)+' · porta '+esc(String(portLab(sw,c.porta))):'sem switch'}${c.eq?' · '+esc(c.eq):''}${c.st&&ST[c.st]?' · '+ST[c.st]:''}</small></div><button class="ib pri" onclick="sheetPatch('${f.it.id}',${f.n})">Ficha</button><button class="ib" onclick="qrDismiss()">✕</button></div>`)},200)}
 function qrFromURL(){const m=location.hash.match(/^#p\/([^&?]+)/)||location.search.match(/[?&]p=([^&]+)/);if(m)setTimeout(()=>openByQR(decodeURIComponent(m[1])),350)}
+function qrClearURL(){try{if(location.hash.match(/^#p\//)||location.search.match(/[?&]p=/))history.replaceState(null,'',location.pathname)}catch(e){}}
+function qrDismiss(){qrClose();qrClearURL()}
 addEventListener('hashchange',qrFromURL);
 let LBCTX=null;function lbRefresh(){if(!LBCTX)return;if(LBCTX.n)sheetLabel(LBCTX.pid,LBCTX.n);else sheetLabels(LBCTX.rid)}
 function sheetLabel(pid,n){const r=rackById(cur.rack),p=itemById(r,pid);if(!p)return;LBCTX={pid,n};const L=espLabelSVG(r,p,n,lbOpts());
@@ -2063,7 +2095,7 @@ function renderHome(){
   if(cur.level==='emp'){
     $('#pName').textContent='InfraDoc';$('#pSub').textContent=`${DB.empresas.length} empresa${DB.empresas.length===1?'':'s'} · documentação de infraestrutura`;
     fab.style.display='';fab.title='Nova empresa';fab.onclick=()=>sheetEmp();
-    m.innerHTML=`<div class="bar"><span class="pgt">Empresas</span><span class="bart">toque para abrir</span><button class="ib sm" style="margin-left:auto" onclick="exportDB()" title="Backup completo">⤓<span class="lg"> Backup</span></button><button class="ib sm" onclick="$('#fileIn').click()" title="Restaurar backup">⤒<span class="lg"> Restaurar</span></button><button class="ib sm" onclick="exportApp()" title="Baixar o sistema já com seus dados dentro">💾<span class="lg"> Sistema + dados</span></button>${window._loggedIn?`<button class="ib sm" onclick="arm(this,()=>window.authLogout&&window.authLogout(),'Toque de novo: sai da conta e volta para a tela de login')" title="Sair da conta">⎋<span class="lg"> Sair</span></button>`:''}</div>
+    m.innerHTML=`<div class="bar"><span class="pgt">Empresas</span><span class="bart">toque para abrir</span><button class="ib sm" style="margin-left:auto" onclick="exportDB()" title="Backup completo">⤓<span class="lg"> Backup</span></button><button class="ib sm" onclick="$('#fileIn').click()" title="Restaurar backup">⤒<span class="lg"> Restaurar</span></button>${window._loggedIn?`<button class="ib sm" onclick="arm(this,()=>window.authLogout&&window.authLogout(),'Toque de novo: sai da conta e volta para a tela de login')" title="Sair da conta">⎋<span class="lg"> Sair</span></button>`:''}</div>
     ${DB._demo?`<div class="note" style="margin:0 14px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="flex:1;min-width:200px"><b>Já usava o InfraDoc em outro arquivo?</b> Traga suas empresas tocando em Restaurar e escolhendo o backup (.json).</span><button class="ib pri" style="height:38px" onclick="$('#fileIn').click()">⤒ Restaurar backup</button></div>`:''}
     <div class="rgrid">${DB.empresas.map(e=>{const h=hue(e.nome),np=e.projetos.length,nr=e.projetos.reduce((a,p)=>a+(p.racks||[]).length,0);
       return `<button class="rcard ecard" style="--a:${EACC[e.tipo]||EACC.escritorio}" onclick="pageIn(()=>{cur.level='proj';cur.emp='${e.id}'})"><span class="etag">${etLabel(e.tipo)}</span><span class="emore" title="Editar ou excluir empresa" onclick="event.stopPropagation();sheetEmp('${e.id}')">⋯</span><div class="rc-art">${bld(e.tipo,e.id,'c'+e.id)}</div><div class="rc-t"><b>${esc(e.nome)}</b><small>${esc([e.cidade,e.rede&&('Rede: '+e.rede)].filter(Boolean).join(' · ')||'—')}</small></div><div class="epills"><span><b>${np}</b> projeto${np===1?'':'s'}</span><span><b>${nr}</b> rack${nr===1?'':'s'}</span></div></button>`}).join('')}
@@ -2111,8 +2143,6 @@ function applyPr(){const v=i=>$(i).value.trim(),d={nome:v('#pNome')||'Projeto',l
   if(ctx.p)Object.assign(ctx.p,d);else{const p={id:uid(),...d,racks:[],fibras:[],uplinks:[],_v2:1};ctx.e.projetos.push(p);markDirty();save();closeSheet();pageIn(()=>openProj(ctx.e.id,p.id));return}
   markDirty();save();closeSheet();render()}
 function delPr(){ctx.e.projetos=ctx.e.projetos.filter(x=>x!==ctx.p);if(S===ctx.p){S=null;cur.level='proj'}markDirty();save();closeSheet();render()}
-async function exportApp(){if(dirty)save();const im=await plImgs();const js=JSON.stringify(Object.keys(im).length?{...DB,plimg:im}:DB).replace(/</g,'\\u003c');const C=document.documentElement.cloneNode(true),q=x=>C.querySelector(x);['#lupa','#srch','#idEmbed'].forEach(x=>q(x)&&q(x).remove());['#main','#sheet','#print','#hstat','#pName','#pSub','#toast'].forEach(x=>{if(q(x))q(x).innerHTML=''});q('body').className='';['#fab','#expBtn'].forEach(x=>q(x)&&q(x).removeAttribute('style'));q('#dbar')&&q('#dbar').classList.remove('on');q('#saveBtn')&&q('#saveBtn').classList.remove('dirty');let h='<!DOCTYPE html>\n'+C.outerHTML;
-  h=h.replace('<script>','<script id="idEmbed" type="application/json">'+js+'</'+'script>\n<script>');dl(new Blob([h],{type:'text/html'}),'infradoc.html');toast('Sistema com seus dados baixado ✓')}
 async function exportDB(){if(dirty)save();const im=await plImgs();dl(new Blob([JSON.stringify(Object.keys(im).length?{...DB,plimg:im}:DB,null,1)],{type:'application/json'}),'infradoc-backup-completo-'+today()+'.json')}
 
 /* ================= SERVIÇOS DO RACK ================= */
@@ -2424,7 +2454,7 @@ document.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||drag){ti
 document.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')tipPos(e)});
 document.addEventListener('pointerdown',()=>{const el=$('#tip');if(el)el.style.display='none'});
 function linkHL(keys){return;if(SQ)return;HL=new Set(keys.filter(Boolean));LHL=true;const r=rackById(cur.rack),st=$('#stage');if(r&&st&&st.firstChild)draw(rackSVG(r,true))}
-function closeSheet(){document.body.classList.remove('open');setTimeout(()=>{try{selBar()}catch(e){}},0);if(LHL){LHL=false;HL=new Set();const r=rackById(cur.rack),st=$('#stage');if(r&&st&&st.firstChild)draw(rackSVG(r,true))}}
+function closeSheet(){document.body.classList.remove('open');qrClearURL();setTimeout(()=>{try{selBar()}catch(e){}},0);if(LHL){LHL=false;HL=new Set();const r=rackById(cur.rack),st=$('#stage');if(r&&st&&st.firstChild)draw(rackSVG(r,true))}}
 let CORCP=null;try{CORCP=localStorage.getItem('infradoc_corcp')}catch(e){}
 function usedCores(){const m={},add=c=>{if(c&&/^#[0-9a-f]{6}$/i.test(c)){c=c.toLowerCase();m[c]=(m[c]||0)+1}};if(!S)return[];
   S.racks.forEach(r=>{r.itens.forEach(it=>{Object.values(it.cons||{}).forEach(c=>add(c.cor));(it.objs||[]).forEach(o=>add(o.cor))});(r.piso||[]).forEach(o=>add(o.cor))});(S.fibras||[]).forEach(x=>add(x.cor));
@@ -3266,6 +3296,20 @@ try{if(!localStorage.getItem('infradoc_dica')){setTimeout(()=>toast('Dica: segur
     btn.disabled=false;btn.textContent=orig;
     if(res.error){setErr('rErr',res.error.message);return}
     setErr('rErr','Link enviado! Confere seu e-mail.');
+  };
+
+  // ===== Assinatura Premium (Mercado Pago) =====
+  // Para ativar: crie um "Link de pagamento" (assinatura recorrente) no painel do
+  // Mercado Pago (mercadopago.com.br → Cobrar → Link de pagamento) e cole a URL
+  // gerada abaixo, no lugar de MP_LINK_PLACEHOLDER. Não precisa de servidor nem
+  // de chaves de API para esse modelo simples — é só trocar a URL.
+  var MP_PREMIUM_LINK='MP_LINK_PLACEHOLDER';
+  window.openPremium=function(){
+    if(!MP_PREMIUM_LINK||MP_PREMIUM_LINK==='MP_LINK_PLACEHOLDER'){
+      toast('Teste grátis em breve ✨');
+      return;
+    }
+    window.open(MP_PREMIUM_LINK,'_blank');
   };
 
   window.authLogout=async function(){
