@@ -949,7 +949,6 @@ try{DB=JSON.parse(localStorage.getItem(DBKEY))}catch(e){}
 {let E=null;try{const el=document.getElementById('idEmbed');if(el)E=JSON.parse(el.textContent)}catch(e){}if(E&&E.plimg){window._plimgE=E.plimg;delete E.plimg}if(E&&E.empresas&&(!DB||!DB.empresas||DB._demo||(E.savedAt||0)>(DB.savedAt||0))){DB=E;try{localStorage.setItem(DBKEY,JSON.stringify(DB))}catch(e){}}}
 if(!DB||!DB.empresas){let old=null;try{old=JSON.parse(localStorage.getItem(KEY))}catch(e){}
   DB=old&&old.racks?{empresas:[{id:uid(),nome:old.cliente||'Minha empresa',cidade:'',projetos:[{...old,id:old.id||uid(),nome:old.nome||'Implantação principal'}]}],tecnico:old.tecnico||''}:{empresas:[],tecnico:''}}
-if(DB.empresas.length===1&&DB.empresas[0].projetos.length===1){cur.level='proj';cur.emp=DB.empresas[0].id}
 
 const H_=it=>(it.tipo==='patch'||it.tipo==='dio'||it.tipo==='tronco')?(it.portas>24?2:1):it.tipo==='switch'?1:(+it.h||1);
 const rackById=id=>(S&&S.racks||[]).find(r=>r.id===id);
